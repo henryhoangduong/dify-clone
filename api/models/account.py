@@ -4,6 +4,7 @@ from typing import List
 from flask_login import UserMixin
 from extensions.ext_database import db
 from sqlalchemy.dialects.postgresql import UUID
+from typing import ClassVar, Optional
 
 
 class AccountStatus(str, enum.Enum):
@@ -20,6 +21,7 @@ class Account(UserMixin, db.Model):
         db.PrimaryKeyConstraint('id', name='account_pkey'),
         db.Index('account_email_idx', 'email')
     )
+
     id = db.Column(UUID, server_default=db.text('uuid_generate_v4()'))
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), nullable=False)
@@ -38,7 +40,23 @@ class Account(UserMixin, db.Model):
                            server_default=db.text('CURRENT_TIMESTAMP(0)'))
     updated_at = db.Column(db.DateTime, nullable=False,
                            server_default=db.text('CURRENT_TIMESTAMP(0)'))
-    _current_tenant: db.Model = None
+
+    _current_tenant: ClassVar[Optional[db.Model]] = None
+
+    @property
+    def current_tenant(self):
+        return self._current_tenant
+
+    @current_tenant.setter
+    def current_tenant(self, value):
+        tenant = value
+        ta = TenantAccountJoin.query.filter_by(
+            tenant_id=tenant.id, account_id=self.id).first()
+        if ta:
+            tenant.current_role = ta.role
+        else:
+            tenant = None
+        self._current_tenant = tenant
 
     @property
     def current_tenant_id(self):
@@ -90,6 +108,7 @@ class Tenant(db.Model):
     __table_args__ = (
         db.PrimaryKeyConstraint('id', name='tenant_pkey'),
     )
+
     id = db.Column(UUID, server_default=db.text('uuid_generate_v4()'))
     name = db.Column(db.String(255), nullable=False)
     encrypt_public_key = db.Column(db.Text)
@@ -110,6 +129,12 @@ class Tenant(db.Model):
         ).all()
 
 
+class TenantAccountJoinRole(enum.Enum):
+    OWNER = 'owner'
+    ADMIN = 'admin'
+    NORMAL = 'normal'
+
+
 class TenantAccountJoin(db.Model):
     __tablename__ = 'tenant_account_joins'
     __table_args__ = (
@@ -119,6 +144,7 @@ class TenantAccountJoin(db.Model):
         db.UniqueConstraint('tenant_id', 'account_id',
                             name='unique_tenant_account_join')
     )
+
     id = db.Column(UUID, server_default=db.text('uuid_generate_v4()'))
     tenant_id = db.Column(UUID, nullable=False)
     account_id = db.Column(UUID, nullable=False)

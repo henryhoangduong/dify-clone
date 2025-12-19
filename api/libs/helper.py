@@ -13,7 +13,7 @@ def run(script):
     return subprocess.getstatusoutput('source /root/.bashrc && ' + script)
 
 
-class TimestampField(fields.raw):
+class TimestampField(fields.Raw):
     def format(self, value):
         return int(value.timestamp())
 
