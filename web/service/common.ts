@@ -1,6 +1,13 @@
-import { IWorkspace } from "@/models/common";
+import { CommonResponse, IWorkspace } from "@/models/common";
 import type { Fetcher } from "swr";
-import { get } from "./base";
+import { get, post } from "./base";
+
+export const login: Fetcher<
+  CommonResponse,
+  { url: string; body: Record<string, any> }
+> = ({ url, body }) => {
+  return post(url, { body }) as Promise<CommonResponse>;
+};
 
 export const fetchWorkspaces: Fetcher<
   { workspaces: IWorkspace[] },

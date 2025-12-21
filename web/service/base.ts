@@ -246,7 +246,6 @@ const baseFetch = (
   ]);
 };
 
-
 export const request = (
   url: string,
   options = {},
@@ -254,7 +253,6 @@ export const request = (
 ) => {
   return baseFetch(url, options, otherOptions || {});
 };
-
 
 export const get = (
   url: string,
@@ -266,4 +264,92 @@ export const get = (
     Object.assign({}, options, { method: "GET" }),
     otherOptions
   );
+};
+
+export const getPublic = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return get(url, options, { ...otherOptions, isPublicAPI: true });
+};
+
+export const post = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return request(
+    url,
+    Object.assign({}, options, { method: "POST" }),
+    otherOptions
+  );
+};
+
+export const postPublic = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return post(url, options, { ...otherOptions, isPublicAPI: true });
+};
+
+export const put = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return request(
+    url,
+    Object.assign({}, options, { method: "PUT" }),
+    otherOptions
+  );
+};
+
+export const putPublic = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return put(url, options, { ...otherOptions, isPublicAPI: true });
+};
+
+export const del = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return request(
+    url,
+    Object.assign({}, options, { method: "DELETE" }),
+    otherOptions
+  );
+};
+
+export const delPublic = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return del(url, options, { ...otherOptions, isPublicAPI: true });
+};
+
+export const patch = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return request(
+    url,
+    Object.assign({}, options, { method: "PATCH" }),
+    otherOptions
+  );
+};
+
+export const patchPublic = (
+  url: string,
+  options = {},
+  otherOptions?: IOtherOptions
+) => {
+  return patch(url, options, { ...otherOptions, isPublicAPI: true });
 };
