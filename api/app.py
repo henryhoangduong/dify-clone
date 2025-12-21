@@ -16,7 +16,7 @@ from extensions.ext_login import login_manager
 
 from config import Config, CloudEditionConfig
 
-from models import model, account, provider, task, web
+from models import model, account, provider, task, web, dataset
 
 
 class DifyApp(Flask):
