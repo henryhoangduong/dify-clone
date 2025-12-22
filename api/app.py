@@ -1,22 +1,23 @@
 import os
+
 if not os.environ.get("DEBUG") or os.environ.get("DEBUG").lower() != 'true':
     from gevent import monkey
     monkey.patch_all()
-import logging
 import json
+import logging
 import threading
 
-from flask import Flask, request, Response, session
 import flask_login
+from flask import Flask, Response, request, session
 from flask_cors import CORS
-from extensions import ext_session, ext_celery, ext_sentry, ext_redis, ext_login, ext_vector_store, ext_migrate, \
-    ext_database, ext_storage
+
+from config import CloudEditionConfig, Config
+from extensions import (ext_celery, ext_database, ext_login, ext_migrate,
+                        ext_redis, ext_sentry, ext_session, ext_storage,
+                        ext_vector_store)
 from extensions.ext_database import db
 from extensions.ext_login import login_manager
-
-from config import Config, CloudEditionConfig
-
-from models import model, account, provider, task, web, dataset
+from models import account, dataset, model, provider, task, web
 
 
 class DifyApp(Flask):

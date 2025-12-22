@@ -1,6 +1,7 @@
 import redis
 from flask import request
-from flask_session import Session, SqlAlchemySessionInterface, RedisSessionInterface
+from flask_session import (RedisSessionInterface, Session,
+                           SqlAlchemySessionInterface)
 from flask_session.sessions import total_seconds
 from itsdangerous import want_bytes
 

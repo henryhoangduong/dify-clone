@@ -1,4 +1,4 @@
-from celery import Task, Celery
+from celery import Celery, Task
 from flask import Flask
 
 

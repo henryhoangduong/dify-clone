@@ -1,10 +1,10 @@
 import enum
-from typing import List
+from typing import ClassVar, List, Optional
 
 from flask_login import UserMixin
-from extensions.ext_database import db
 from sqlalchemy.dialects.postgresql import UUID
-from typing import ClassVar, Optional
+
+from extensions.ext_database import db
 
 
 class AccountStatus(str, enum.Enum):

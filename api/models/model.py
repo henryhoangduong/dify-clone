@@ -4,8 +4,9 @@ from flask import current_app
 from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import UUID
 
-from libs.helper import generate_string
 from extensions.ext_database import db
+from libs.helper import generate_string
+
 from .account import Account, Tenant
 
 
