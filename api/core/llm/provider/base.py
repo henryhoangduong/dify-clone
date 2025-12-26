@@ -1,6 +1,6 @@
 import base64
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, Union
 
 from core import hosted_llm_credentials
 from core.llm.error import (ModelCurrentlyNotSupportError,
@@ -8,6 +8,7 @@ from core.llm.error import (ModelCurrentlyNotSupportError,
 from extensions.ext_database import db
 from models.account import Tenant
 from models.provider import Provider, ProviderName, ProviderType
+from libs import rsa
 
 
 class BaseProvider(ABC):
@@ -18,7 +19,7 @@ class BaseProvider(ABC):
         provider = self.get_provider(prefer_custom)
         if not provider:
             raise ProviderTokenNotInitError()
-        
+
         if provider.provider_type == ProviderType.SYSTEM.value:
             quota_used = provider.quota_used if provider.quota_used is not None else 0
             quota_limit = provider.quota_limit if provider.quota_limit is not None else 0
@@ -64,6 +65,41 @@ class BaseProvider(ABC):
 
         return hosted_llm_credentials.openai.api_key
 
+    def get_provider_configs(self, obfuscated: bool = False) -> Union[str | dict]:
+        """
+        Returns the provider configs.
+        """
+        try:
+            config = self.get_provider_api_key()
+        except:
+            config = 'THIS-IS-A-MOCK-TOKEN'
+
+        if obfuscated:
+            return self.obfuscated_token(config)
+
+        return config
+
+    def obfuscated_token(self, token: str):
+        return token[:6] + "*" * (len(token)-8)+token[:2]
+
+    def get_token_type(self):
+        return str
+
+    def get_encrypted_token(self, config: Union[dict | str]):
+        return self.encrypt_token(config)
+
+    def get_decrypted_token(self, token: str):
+        return self.decrypt_token(token)
+
+    def encrypt_token(self, token):
+        tenant = db.session.query(Tenant).filter(
+            Tenant.id == self.tenant_id).first()
+        encrypted_token = rsa.encrypt(token, tenant.encrypt_public_key)
+        return base64.b64encode(encrypted_token).decode()
+
+    def decrypt_token(self, token):
+        return rsa.decrypt(base64.b64decode(token), self.tenant_id)
+    
     @abstractmethod
     def get_provider_name(self):
         raise NotImplementedError

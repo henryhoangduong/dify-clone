@@ -2,7 +2,7 @@ import logging
 from typing import Optional, Union
 
 import openai
-from openai import AuthenticationError, OpenAIError
+from openai.error import AuthenticationError, OpenAIError
 
 from core.llm.moderation import Moderation
 from core.llm.provider.base import BaseProvider
